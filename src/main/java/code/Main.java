@@ -36,14 +36,16 @@ public class Main {
                         // Example of accessing a field called "name"
                         if(avroRecord.get("info") != null){
                             System.out.println("Information: " + avroRecord.get("info").toString());
+
+                            // Creating a new thread to run asyncFunction
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    asyncFunction();
+                                }
+                            }).start(); // Start the thread (non-blocking)
                         }
 
-                        try {
-                            TimeUnit.SECONDS.sleep(2); // Delay for 5 seconds
-                        } catch (InterruptedException e) {
-                            System.err.println("Sleep interrupted: " + e.getMessage());
-                            Thread.currentThread().interrupt();
-                        }
                     } else {
                         System.out.println("Received a null record.");
                     }
@@ -68,6 +70,29 @@ public class Main {
                 System.out.println("Partition: " + record.partition() + ", Offset: " + record.offset());
                 // Add custom logic to process the Kafka message here
             });
+        }
+    }
+
+    public static void asyncFunction(){
+        KafkaSchemaProducer producer = new KafkaSchemaProducer();
+        try {
+            TimeUnit.SECONDS.sleep(2); // Delay for 5 seconds
+
+            GenericRecord record = new GenericData.Record(producer.getAvroSchema());
+
+            record.put("info", "Test Info");
+            record.put("active", true);
+            record.put("textBuffer", ByteBuffer.wrap("Test Buffer".getBytes(StandardCharsets.UTF_8)));
+            record.put("data", "Test Data " + System.currentTimeMillis());
+            record.put("type", "Test Type");
+            record.put("file", null); // Example with null file
+
+            producer.produce("sub-topic", "key1", record, 0).join(); // Produce message
+        } catch (Exception e) {
+            System.err.println("Sleep interrupted: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        }finally {
+            producer.close();
         }
     }
 }

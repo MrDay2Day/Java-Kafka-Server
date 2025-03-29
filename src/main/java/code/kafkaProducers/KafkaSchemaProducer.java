@@ -78,17 +78,31 @@ public class KafkaSchemaProducer {
     public static void main(String[] args) {
         KafkaSchemaProducer producer = new KafkaSchemaProducer();
 
-        // Example Usage - You'll need to create a GenericRecord object
-        GenericRecord record = new GenericData.Record(producer.getAvroSchema());
-        record.put("info", "Test Info");
-        record.put("active", true);
-        record.put("textBuffer", ByteBuffer.wrap("Test Buffer".getBytes(StandardCharsets.UTF_8)));
-        record.put("data", "Test Data " + System.currentTimeMillis());
-        record.put("type", "Test Type");
-        record.put("file", null); // Example with null file
+        while (true) {
+            try {
+                Thread.sleep(1000); // Sleep for 1 second
 
-        producer.produce("sub-topic", "key1", record, 0).join();
+                GenericRecord record = new GenericData.Record(producer.getAvroSchema());
+                record.put("info", "Test Info");
+                record.put("active", true);
+                record.put("textBuffer", ByteBuffer.wrap("Test Buffer".getBytes(StandardCharsets.UTF_8)));
+                record.put("data", "Test Data " + System.currentTimeMillis());
+                record.put("type", "Test Type");
+                record.put("file", null); // Example with null file
 
-        producer.close();
+                producer.produce("sub-topic", "key1", record, 0).join(); // Produce message
+
+            } catch (InterruptedException e) {
+                System.err.println("Sleep interrupted: " + e.getMessage());
+                Thread.currentThread().interrupt();
+
+                break; // Exit the loop if interrupted
+            } catch (Exception e) {
+                System.err.println("Error during message production: " + e.getMessage());
+                producer.close();
+                e.printStackTrace(); // Log the error
+                // Optionally, add retry logic or other error handling.
+            }
+        }
     }
 }
