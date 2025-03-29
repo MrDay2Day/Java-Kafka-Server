@@ -2,14 +2,18 @@ package code;
 
 import code.kafkaConsumers.KafkaDynamicConsumer;
 import code.kafkaConsumers.KafkaSchemaConsumer;
+import code.kafkaProducers.KafkaSchemaProducer;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, World!");
-
-
 
         boolean useSchema = true;
 
@@ -32,6 +36,13 @@ public class Main {
                         // Example of accessing a field called "name"
                         if(avroRecord.get("info") != null){
                             System.out.println("Information: " + avroRecord.get("info").toString());
+                        }
+
+                        try {
+                            TimeUnit.SECONDS.sleep(2); // Delay for 5 seconds
+                        } catch (InterruptedException e) {
+                            System.err.println("Sleep interrupted: " + e.getMessage());
+                            Thread.currentThread().interrupt();
                         }
                     } else {
                         System.out.println("Received a null record.");
@@ -58,7 +69,5 @@ public class Main {
                 // Add custom logic to process the Kafka message here
             });
         }
-
-
     }
 }

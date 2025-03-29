@@ -62,6 +62,10 @@ public class KafkaSchemaProducer {
         producer.close();
     }
 
+    public Schema getAvroSchema() {
+        return avroSchema;
+    }
+
     private Properties getProperties() {
         Properties properties = new Properties();
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServers);
@@ -75,7 +79,7 @@ public class KafkaSchemaProducer {
         KafkaSchemaProducer producer = new KafkaSchemaProducer();
 
         // Example Usage - You'll need to create a GenericRecord object
-        GenericRecord record = new GenericData.Record(producer.avroSchema);
+        GenericRecord record = new GenericData.Record(producer.getAvroSchema());
         record.put("info", "Test Info");
         record.put("active", true);
         record.put("textBuffer", ByteBuffer.wrap("Test Buffer".getBytes(StandardCharsets.UTF_8)));
