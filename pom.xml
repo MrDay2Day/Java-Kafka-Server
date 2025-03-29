@@ -39,23 +39,41 @@
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
             <version>${confluent.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
             <version>${avro.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro-tools</artifactId>
+            <version>1.11.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -69,6 +87,23 @@
                     <source>21</source>
                     <target>21</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-avro-tools</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>avro-tools</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/avro-tools</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
