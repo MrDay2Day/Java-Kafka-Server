@@ -9,6 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -68,31 +69,23 @@ public class Main {
                 System.out.println("Key: " + record.key());
                 System.out.println("Value: " + record.value());
                 System.out.println("Partition: " + record.partition() + ", Offset: " + record.offset());
-                // Add custom logic to process the Kafka message here
+                // Add custom logic to process the Kafka record here
             });
         }
     }
 
     public static void asyncFunction(){
-        KafkaSchemaProducer producer = new KafkaSchemaProducer();
+
         try {
-            TimeUnit.SECONDS.sleep(2); // Delay for 5 seconds
+            System.out.println("Async function started");
 
-            GenericRecord record = new GenericData.Record(producer.getAvroSchema());
+            TimeUnit.SECONDS.sleep(new Random().nextInt(10 - 2 + 1) + 2);
 
-            record.put("info", "Test Info");
-            record.put("active", true);
-            record.put("textBuffer", ByteBuffer.wrap("Test Buffer".getBytes(StandardCharsets.UTF_8)));
-            record.put("data", "Test Data " + System.currentTimeMillis());
-            record.put("type", "Test Type");
-            record.put("file", null); // Example with null file
-
-            producer.produce("sub-topic", "key1", record, 0).join(); // Produce message
+            System.out.println("Async function completed");
         } catch (Exception e) {
             System.err.println("Sleep interrupted: " + e.getMessage());
             Thread.currentThread().interrupt();
-        }finally {
-            producer.close();
         }
+
     }
 }

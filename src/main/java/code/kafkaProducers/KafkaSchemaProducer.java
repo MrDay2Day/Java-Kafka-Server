@@ -78,9 +78,10 @@ public class KafkaSchemaProducer {
     public static void main(String[] args) {
         KafkaSchemaProducer producer = new KafkaSchemaProducer();
 
+        // Loops to continuously produce messages
         while (true) {
             try {
-                Thread.sleep(1000); // Sleep for 1 second
+                //Thread.sleep(100); // Sleep for 1 second
 
                 GenericRecord record = new GenericData.Record(producer.getAvroSchema());
                 record.put("info", "Test Info");
@@ -91,17 +92,22 @@ public class KafkaSchemaProducer {
                 record.put("file", null); // Example with null file
 
                 producer.produce("sub-topic", "key1", record, 0).join(); // Produce message
+                producer.produce("sub-topic", "key2", record, 1).join(); // Produce message
+                producer.produce("sub-topic", "key3", record, 2).join(); // Produce message
+                producer.produce("sub-topic", "key4", record, 3).join(); // Produce message
+                producer.produce("sub-topic", "key5", record, 4).join(); // Produce message
+                producer.produce("sub-topic", "key6", record, 5).join(); // Produce message
+                producer.produce("sub-topic", "key6", record, 5).join(); // Produce message
+                producer.produce("sub-topic", "key6", record, 5).join(); // Produce message
+                producer.produce("sub-topic", "key7", record, 6).join(); // Produce message
+                producer.produce("sub-topic", "key8", record, 10).join(); // Produce message
 
-            } catch (InterruptedException e) {
-                System.err.println("Sleep interrupted: " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Kafka Error: " + e.getMessage());
                 Thread.currentThread().interrupt();
+                producer.close();
 
                 break; // Exit the loop if interrupted
-            } catch (Exception e) {
-                System.err.println("Error during message production: " + e.getMessage());
-                producer.close();
-                e.printStackTrace(); // Log the error
-                // Optionally, add retry logic or other error handling.
             }
         }
     }
