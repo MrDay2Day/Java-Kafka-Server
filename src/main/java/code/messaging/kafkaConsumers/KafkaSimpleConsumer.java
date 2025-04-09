@@ -1,4 +1,4 @@
-package code.kafkaConsumers;
+package code.messaging.kafkaConsumers;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -12,11 +12,16 @@ import java.util.Properties;
 
 public class KafkaSimpleConsumer {
 
+    public static void main(String[] args) {
+        KafkaSimpleConsumer consumer = new KafkaSimpleConsumer();
+        consumer.connect(args);
+    }
+
     public void connect(String[] args) {
 
         String bootstrapServers = "localhost:9092,localhost:9093"; // Replace with your Kafka broker address
         String groupId = "my-consumer-group";
-        String topic = "ping";
+        String topic = "messages";
 
         // Create consumer properties
         Properties properties = new Properties();

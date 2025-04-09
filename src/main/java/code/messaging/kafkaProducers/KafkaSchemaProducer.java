@@ -1,4 +1,4 @@
-package code.kafkaProducers;
+package code.messaging.kafkaProducers;
 
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
@@ -32,7 +32,7 @@ public class KafkaSchemaProducer {
         this.producer = new KafkaProducer<>(properties);
         try {
             String schemaString =
-                    new String(Files.readAllBytes(Paths.get("src/main/java/code/schema/" + this.schemaName + ".avsc")));
+                    new String(Files.readAllBytes(Paths.get("src/main/java/code/messaging/schema/" + this.schemaName + ".avsc")));
             JSONObject jsonObject = new JSONObject(schemaString); // Create JSONObject from the string
             String avroSchemaJson = jsonObject.getString("schema"); // Extract the "schema" value
             this.avroSchema = new Schema.Parser().parse(avroSchemaJson); // Parse the schema

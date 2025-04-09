@@ -1,4 +1,4 @@
-package code.schema;
+package code.messaging.schema;
 
 import java.io.BufferedReader;
 import java.io.File;
