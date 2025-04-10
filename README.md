@@ -152,51 +152,6 @@ KafkaStreams streams = new KafkaStreams(builder.build(), streamsProps);
 streams.start();
 ```
 
-### Multi-Thread Synchronization
-
-This is done using `CountDownLatch` which is part of the Java Concurrency API (specifically, the `java.util.concurrent` package).
-
-The `java.util.concurrent` API in Java is a powerful set of tools designed to simplify and enhance the development of concurrent applications. In essence, it provides developers with high-level abstractions and utilities for managing threads, coordinating their activities, and ensuring thread safety.
-
-```java
-import java.util.concurrent.CountDownLatch;
-...
-CountDownLatch latch = new CountDownLatch(4);
-```
-The `CountDownLatch` serves as a synchronization mechanism for coordinating multiple threads. Specifically, in the `ProcessSchemaStream` class, it's used to manage the lifecycle of multiple Kafka Streams instances.
-
-```java
-CountDownLatch latch = new CountDownLatch(4);
-
-new Thread(() -> processMessages(1, latch)).start();
-new Thread(() -> processMessages(2, latch)).start();
-new Thread(() -> processMessages(3, latch)).start();
-new Thread(() -> processMessages(4, latch)).start();
-
-latch.await();
-```
-
-1. **Initialization:** The `CountDownLatch(4)` creates a latch initialized with a count of 4, representing the four threads you're starting.
-1. **Thread Management:** Each thread runs the `processMessages()` method with its own ID and a reference to the latch.
-1. **Blocking Mechanism:** The `latch.await()` call blocks the main thread until the latch's count reaches zero. This prevents the main program from exiting while your stream processing threads are still active.
-1. **Countdown Mechanism:** Inside each thread, you have:
-
-    ```java
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-        streams.close();
-        latch.countDown();
-    }));
-    ```
-   When each stream is closed (during application shutdown), the `latch.countDown()` decrements the latch count. Once all four streams have been closed and their respective `countDown()` methods called, the latch count reaches zero.
-1. **Coordinated Shutdown:** This ensures all streams are properly closed before the application completely terminates, preventing resource leaks and data loss.
-
-This pattern is particularly useful for Kafka Streams applications where you want to ensure all stream processing completes or shuts down properly before your application exits.
-
-
-
-
-
-
 
 ## ⚙️ Configuration
 
@@ -248,6 +203,48 @@ CompletableFuture<Void> produce(String topic, String key, String value, Integer 
     });
 }
 ```
+
+
+### Multi-Thread Synchronization
+
+This is done using `CountDownLatch` which is part of the Java Concurrency API (specifically, the `java.util.concurrent` package).
+
+The `java.util.concurrent` API in Java is a powerful set of tools designed to simplify and enhance the development of concurrent applications. In essence, it provides developers with high-level abstractions and utilities for managing threads, coordinating their activities, and ensuring thread safety.
+
+```java
+import java.util.concurrent.CountDownLatch;
+...
+CountDownLatch latch = new CountDownLatch(4);
+```
+The `CountDownLatch` serves as a synchronization mechanism for coordinating multiple threads. Specifically, in the `ProcessSchemaStream` class, it's used to manage the lifecycle of multiple Kafka Streams instances.
+
+```java
+CountDownLatch latch = new CountDownLatch(4);
+
+new Thread(() -> processMessages(1, latch)).start();
+new Thread(() -> processMessages(2, latch)).start();
+new Thread(() -> processMessages(3, latch)).start();
+new Thread(() -> processMessages(4, latch)).start();
+
+latch.await();
+```
+
+1. **Initialization:** The `CountDownLatch(4)` creates a latch initialized with a count of 4, representing the four threads you're starting.
+1. **Thread Management:** Each thread runs the `processMessages()` method with its own ID and a reference to the latch.
+1. **Blocking Mechanism:** The `latch.await()` call blocks the main thread until the latch's count reaches zero. This prevents the main program from exiting while your stream processing threads are still active.
+1. **Countdown Mechanism:** Inside each thread, you have:
+
+    ```java
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        streams.close();
+        latch.countDown();
+    }));
+    ```
+   When each stream is closed (during application shutdown), the `latch.countDown()` decrements the latch count. Once all four streams have been closed and their respective `countDown()` methods called, the latch count reaches zero.
+1. **Coordinated Shutdown:** This ensures all streams are properly closed before the application completely terminates, preventing resource leaks and data loss.
+
+This pattern is particularly useful for Kafka Streams applications where you want to ensure all stream processing completes or shuts down properly before your application exits.
+
 
 ## 📄 License
 
