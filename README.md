@@ -89,7 +89,7 @@ Kafka Server/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/kafka-java-project.git
+   git clone https://github.com/MrDay2Day/kafka-java-project.git
    cd kafka-java-project
    ```
 
