@@ -55,6 +55,7 @@ public class ProcessSchemaStream {
 
         source.mapValues(value -> {
             try {
+                // Process data before sending to the output topic
                 Thread.sleep(100);
                 System.out.println("Stream " + streamCount + " processing: " + value.toString());
                 return value;

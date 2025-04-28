@@ -40,6 +40,8 @@ Kafka Server/
 │       │       │   │   ├── KafkaDynamicProducer.java     (Dynamic topic subscription)
 │       │       │   │   ├── KafkaSchemaProducer.java      (Schema registry producer)
 │       │       │   │   └── KafkaSimpleProducer.java      (Simple producer implementation)
+│       │       │   ├── admin/
+│       │       │   │   └── KafkaAdmin.java               (Simple adminnistration implementation)
 │       │       │   └── schema/
 │       │       │       ├── [[SCHEMA_NAME]].avsc          (Schemas downloaded from registry)
 │       │       │       ├── SchemaDownloadCreateClass.java
@@ -53,6 +55,18 @@ Kafka Server/
 ```
 
 ## ✨ Features
+
+### Kafka Admin
+- **Topic Creation**: Create topics with specified configurations
+- **Topic Deletion**: Delete existing topics
+- **Topic Listing**: List all available topics in the Kafka cluster
+- **Topic Description**: Get detailed information about a specific topic
+- **Topic Configuration**: Update topic configurations
+- **Topic Partition Management**: Increase or decrease the number of partitions for a topic
+- **Topic Replication Factor Management**: Change the replication factor for a topic
+- **Topic Cleanup Policy Management**: Update the cleanup policy for a topic
+- **Topic Retention Policy Management**: Change the retention policy for a topic
+- **Topic ACL Management**: Manage Access Control Lists (ACLs) for topics
 
 ### Kafka Producers
 
@@ -103,6 +117,83 @@ Kafka Server/
    ```
 
 ## 📝 Usage Examples
+
+### Basic Admin Operations
+
+This module provides administrative capabilities for Apache Kafka using the Kafka Admin Client API. It allows for common Kafka administrative tasks such as creating topics and modifying topic configurations.
+
+#### Features
+
+- Create new Kafka topics with custom configurations
+- Alter existing topic configurations (retention policies, cleanup policies, etc.)
+- Error handling for common scenarios like duplicate topics
+
+#### Configuration Options
+
+The utility comes with the following default configurations that can be modified in the code:
+
+| Parameter | Default Value | Description |
+|-----------|---------------|-------------|
+| BOOTSTRAP_SERVERS | localhost:9092,localhost:9093 | Comma-separated list of Kafka broker addresses |
+| TOPIC_NAME | stream_input_topic | Name of the topic to create/modify |
+| NUM_PARTITIONS | 3 | Number of partitions for the topic |
+| REPLICATION_FACTOR | 2 | Replication factor for the topic |
+| RETENTION_MS | 7 days | Default message retention period |
+| MAX_MESSAGE_SIZE | 1MB | Maximum message size |
+| CLEANUP_POLICY | delete | Topic cleanup policy (delete or compact) |
+
+#### Usage
+
+1. Ensure your Kafka cluster is running and accessible
+2. Update the configuration variables in the code if needed
+3. Run the application:
+
+```bash
+java -cp <classpath> code.admin.KafkaAdmin
+```
+
+#### Example Operations
+
+#### Creating a Topic
+
+The utility will create a new topic with specified configurations:
+- Topic name: stream_input_topic
+- Partitions: 3
+- Replication factor: 2
+- Initial configurations:
+   - Retention bytes: 100MB
+   - Cleanup policy: delete
+
+#### Modifying Topic Configuration
+
+After creating the topic, the utility modifies:
+- Retention period to 14 days
+- Changes cleanup policy to "compact"
+
+#### Extending Functionality
+
+You can extend this utility by adding more administrative operations such as:
+- Listing all topics
+- Describing topic details
+- Deleting topics
+- Managing consumer groups
+- Managing ACLs
+
+Look for the comment "You can add more operations here" in the code to add your own implementations.
+
+#### Error Handling
+
+The utility includes error handling for common scenarios:
+- Topics that already exist
+- Configuration errors
+- Interruption during operations
+
+[Add your license information here]
+
+
+
+
+
 
 ### Basic Producer-Consumer
 
