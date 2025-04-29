@@ -1,13 +1,13 @@
 package code.admin;
 
 import org.apache.kafka.clients.admin.*;
-import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.apache.kafka.common.acl.*;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.errors.TopicExistsException;
 import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 import org.apache.kafka.common.resource.*;
+import org.apache.kafka.common.security.auth.KafkaPrincipal;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -52,7 +52,7 @@ public class KafkaAdmin {
             // kafkaAdmin.deleteTopicAcl(TOPIC_NAME, "User:alice", AclOperation.READ);
 
             // Note: Uncomment to delete the topic
-            // kafkaAdmin.deleteTopic(TOPIC_NAME);
+            kafkaAdmin.deleteTopic(TOPIC_NAME);
         } finally {
             kafkaAdmin.close();
         }
@@ -248,64 +248,61 @@ public class KafkaAdmin {
         }
     }
 
-    /*
+    /**
      * Create an ACL for a topic
      */
-//    public void createTopicAcl(String topicName, String principal, AclOperation operation) {
-//        ResourcePattern resourcePattern = new ResourcePattern(
-//                ResourceType.TOPIC,
-//                topicName,
-//                PatternType.LITERAL
-//        );
-//
-//        AccessControlEntry accessControlEntry = new AccessControlEntry(
-//                principal,
-//                "*",  // any host
-//                operation,
-//                AclPermissionType.ALLOW
-//        );
-//
-//        AclBinding aclBinding = new AclBinding(resourcePattern, accessControlEntry);
-//
-//        try {
-//            CreateAclsResult createAclsResult = adminClient.createAcls(Collections.singletonList(aclBinding));
-//            createAclsResult.all().get();
-//            System.out.println("Created ACL for principal '" + principal + "' with operation '" + operation + "' on topic '" + topicName + "'");
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            System.err.println("Interrupted while creating ACL: " + e);
-//        } catch (ExecutionException e) {
-//            System.err.println("Error creating ACL: " + e);
-//        }
-//    }
+    public void createTopicAcl(String topicName, String principal, AclOperation operation) {
+        ResourcePattern resourcePattern = new ResourcePattern(
+                ResourceType.TOPIC,
+                topicName,
+                PatternType.LITERAL
+        );
 
-    /*
+        AccessControlEntry accessControlEntry = new AccessControlEntry(
+                principal,
+                "*",  // any host
+                operation,
+                AclPermissionType.ALLOW
+        );
+
+        AclBinding aclBinding = new AclBinding(resourcePattern, accessControlEntry);
+
+        try {
+            CreateAclsResult createAclsResult = adminClient.createAcls(Collections.singletonList(aclBinding));
+            createAclsResult.all().get();
+            System.out.println("Created ACL for principal '" + principal + "' with operation '" + operation + "' on topic '" + topicName + "'");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Interrupted while creating ACL: " + e);
+        } catch (ExecutionException e) {
+            System.err.println("Error creating ACL: " + e);
+        }
+    }
+
+    /**
      * Delete an ACL for a topic
      */
-//    public void deleteTopicAcl(String topicName, String principal, AclOperation operation) {
-//        AclBindingFilter aclBindingFilter = new AclBindingFilter(
-//                new ResourcePatternFilter(ResourceType.TOPIC, topicName, PatternType.LITERAL),
-//                new AccessControlEntryFilter(principal, "*", operation, AclPermissionType.ALLOW)
-//        );
-//
-//        try {
-//            DeleteAclsResult deleteAclsResult = adminClient.deleteAcls(Collections.singletonList(aclBindingFilter));
-//            Collection<AclBinding> deletedAcls = new ArrayList<>();
-//
-//            for (Map.Entry<AclBindingFilter, KafkaFuture<DeleteAclsResult.FilterResults>> entry : deleteAclsResult.all().get().entrySet()) {
-//                DeleteAclsResult.FilterResults results = entry.getValue().get();
-//                results.acls().forEach(deletedAcls::add);
-//            }
-//
-//            System.out.println("Deleted " + deletedAcls.size() + " ACLs for topic '" + topicName + "':");
-//            deletedAcls.forEach(acl -> System.out.println("  " + acl));
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            System.err.println("Interrupted while deleting ACL: " + e);
-//        } catch (ExecutionException e) {
-//            System.err.println("Error deleting ACL: " + e);
-//        }
-//    }
+    public void deleteTopicAcl(String topicName, String principal, AclOperation operation) {
+        AclBindingFilter aclBindingFilter = new AclBindingFilter(
+                new ResourcePatternFilter(ResourceType.TOPIC, topicName, PatternType.LITERAL),
+                new AccessControlEntryFilter(principal, "*", operation, AclPermissionType.ALLOW)
+        );
+
+        try {
+            DeleteAclsResult deleteAclsResult = adminClient.deleteAcls(Collections.singletonList(aclBindingFilter));
+            Collection<AclBinding> deletedAcls = deleteAclsResult.all().get().stream()
+                    // .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+
+            System.out.println("Deleted " + deletedAcls.size() + " ACLs for topic '" + topicName + "':");
+            deletedAcls.forEach(acl -> System.out.println("  " + acl));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Interrupted while deleting ACL: " + e);
+        } catch (ExecutionException e) {
+            System.err.println("Error deleting ACL: " + e);
+        }
+    }
 
 
     /**
