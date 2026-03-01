@@ -16,6 +16,7 @@ public class Main {
         KafkaSchemaConsumer avroConsumer = new KafkaSchemaConsumer("schema_topic", "sub-topic");
         avroConsumer.Listen(Main::callBackMethod);
 
+        // Generic Consumer
         KafkaDynamicConsumer dynamicConsumer = new KafkaDynamicConsumer("schema_topic", "sub-topic");
         dynamicConsumer.listen(Main::callBackMethod);
     }
